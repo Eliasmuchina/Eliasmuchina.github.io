@@ -1,0 +1,1561 @@
+<head>
+	<link
+		rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+	/>
+	<script
+		src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+		integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
+		crossorigin="anonymous"
+	></script>
+	<style>
+		.webchat-container {
+			position: absolute;
+			bottom: 5vh;
+			right: 4vw;
+			width: max-content;
+			height: max-content;
+			z-index: 9999 !important;
+			background-color: #fff;
+		}
+
+		.widget-container {
+			position: relative;
+			bottom: 0;
+			right: 0;
+			height: max-content;
+		}
+
+		.widget-button {
+			height: 50px;
+			width: 50px;
+			cursor: pointer;
+			border-radius: 50%;
+			font-size: 20px;
+			background-color: #ef4823;
+			color: #fff;
+			border: none;
+			outline: none;
+		}
+
+		/* .close {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			width: 100%;
+			position: sticky;
+			top: 0;
+			background-color: #ef4823;
+			z-index: 1;
+		}
+
+		.close-btn {
+			cursor: pointer;
+			font-size: 20px;
+			color: #fff;
+			margin: 10px;
+		}
+
+		.reset {
+			cursor: pointer;
+			font-size: 15px;
+			color: #fff;
+			margin: 10px;
+		} */
+
+		.close {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			width: 100%;
+			position: sticky;
+			top: 0;
+			background-color: #fff;
+			border-bottom: 1px solid rgba(239, 72, 35, 0.3);
+			z-index: 1;
+			border-radius: 20px 20px 0 0;
+		}
+
+		.close-btn {
+			cursor: pointer;
+			font-size: 20px;
+			color: #008080;
+			margin: 10px;
+		}
+
+		.reset {
+			cursor: pointer;
+			font-size: 15px;
+			color: #008080;
+			margin: 10px;
+		}
+
+		/* .webchat {
+			height: 100%;
+			width: 320px;
+			border-radius: 10px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+			margin: auto;
+			padding: 0;
+			display: none;
+			flex-direction: column;
+			overflow-y: scroll;
+			scroll-behavior: smooth;
+			gap: 10px;
+		} */
+
+		.webchat {
+			height: 100%;
+			width: 320px;
+			border-radius: 20px;
+			/* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); */
+			box-shadow: 0 2px 5px rgba(239, 72, 35, 0.3);
+			margin: auto;
+			padding-right: 5px;
+			padding-left: 5px;
+			display: none;
+			flex-direction: column;
+			overflow-y: scroll;
+			scroll-behavior: smooth;
+			gap: 10px;
+			background-color: #fff;
+			font-family: Arial, sans-serif;
+			font-size: 13px;
+			line-height: 1.5;
+			color: #333;
+			position: relative;
+		}
+
+		.webchat::-webkit-scrollbar {
+			/* width: 5px;
+			height: 50%; */
+			display: none;
+		}
+
+		.webchat::-webkit-scrollbar-thumb {
+			background-color: #e0e0e0;
+		}
+
+		.footer-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 3px;
+			width: 100%;
+			order: 999;
+			margin: auto;
+			margin-bottom: 0;
+			position: sticky;
+			bottom: 0;
+			background-color: #fff;
+			z-index: 1;
+		}
+
+		/* .input-container {
+			display: none;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+		}
+
+		#user-input {
+			margin-right: 5px;
+			padding: 6px;
+			font-size: 15px;
+			border: none;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+			outline: none;
+		}
+
+		#send-button {
+			background-color: #4caf50;
+			color: white;
+			border: none;
+			outline: none;
+			padding: 5px 8px;
+			font-size: 15px;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+		}
+
+		#send-button:hover {
+			background-color: #3e8e41;
+		} */
+
+		.input-container {
+			display: none;
+			align-items: center;
+			justify-content: center;
+			width: 95%;
+			padding: 5px;
+			/* background-color: #f6f6f6; */
+		}
+
+		#user-input {
+			flex: 1;
+			margin-right: 5px;
+			padding: 6px;
+			font-size: 15px;
+			border: none;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+			outline: none;
+			background-color: #fff;
+		}
+
+		#send-button {
+			background-color: #4284f4;
+			color: white;
+			border: none;
+			outline: none;
+			padding: 5px 8px;
+			font-size: 15px;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+			border-radius: 5px;
+		}
+
+		#send-button:hover {
+			background-color: #3366cc;
+		}
+
+		/* .webchat-footer {
+			width: 100%;
+			text-align: center;
+			background-color: #f6f6f6;
+			color: #ef4823;
+			height: 25px;
+		}
+
+		.webchat-footer a {
+			margin: 0;
+			color: #ef4823;
+			text-decoration: none;
+		} */
+
+		.webchat-footer {
+			width: 100%;
+			text-align: center;
+			background-color: #fff;
+			border-top: 1px solid rgba(239, 72, 35, 0.3);
+			padding: 10px 0;
+			font-size: 14px;
+		}
+
+		.webchat-footer a {
+			margin: 0 10px;
+			color: #4284f4;
+			text-decoration: none;
+			font-weight: bold;
+		}
+
+		.webchat-footer a:hover {
+			text-decoration: underline;
+			color: #ef4823;
+		}
+
+		/* .message {
+			background-color: #fff;
+			border-radius: 5px;
+			padding: 3px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+			min-width: 20%;
+			max-width: 75%;
+			height: max-content;
+			align-self: flex-start;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin-left: 10px;
+		}
+
+		.message p {
+			font-size: 16px;
+			line-height: 1.5;
+			margin: 0;
+		}
+
+		.message-button {
+			background-color: #fff;
+			border-radius: 5px;
+			padding: 10px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+			outline: none;
+			border: none;
+			min-width: 20%;
+			max-width: 75%;
+			height: max-content;
+			align-self: flex-start;
+			cursor: pointer;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			justify-content: center;
+			gap: 5px;
+			text-align: left;
+			margin-left: 10px;
+		}
+
+		.message-button span {
+			color: #4284f4;
+			border-top: 1px solid #767676;
+			width: 100%;
+			padding-top: 3px;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			position: relative;
+		}
+
+		.message-button:hover {
+			background-color: #fff;
+		}
+
+		.message.loading::after {
+			content: " .";
+			animation: ellipsis 1s infinite;
+			font-size: 20px;
+		}
+
+		@keyframes ellipsis {
+			0% {
+				content: " .";
+			}
+			33% {
+				content: " ..";
+			}
+			66% {
+				content: " ...";
+			}
+			100% {
+				content: " .";
+			}
+		} */
+
+		.message {
+			background-color: #f0f0f0;
+			border-radius: 25px;
+			padding: 10px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+			min-width: 20%;
+			max-width: 75%;
+			height: max-content;
+			align-self: flex-start;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin-left: 10px;
+		}
+
+		.message p {
+			/* font-size: 16px;
+			line-height: 1.5; */
+			margin: 0;
+		}
+
+		.message-button {
+			background-color: #87cefa;
+			border-radius: 25px;
+			padding: 10px 20px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+			outline: none;
+			border: none;
+			min-width: 20%;
+			max-width: 75%;
+			height: max-content;
+			align-self: flex-start;
+			cursor: pointer;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			justify-content: center;
+			gap: 5px;
+			text-align: left;
+			margin-left: 10px;
+		}
+
+		.message-button span {
+			color: #fff;
+			/* font-weight: bold; */
+			width: 100%;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			position: relative;
+		}
+
+		.message-button:hover {
+			background-color: #4a8cff;
+		}
+
+		.message.loading::after {
+			content: " .";
+			animation: ellipsis 1s infinite;
+			font-size: 20px;
+		}
+
+		@keyframes ellipsis {
+			0% {
+				content: " .";
+			}
+			33% {
+				content: " ..";
+			}
+			66% {
+				content: " ...";
+			}
+			100% {
+				content: " .";
+			}
+		}
+
+		/* .reply-message {
+			background-color: #f1f1f1;
+			border-radius: 5px;
+			padding: 3px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+			min-width: 20%;
+			max-width: 75%;
+			height: max-content;
+			align-self: flex-end;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			word-wrap: normal;
+			margin-right: 10px;
+		}
+
+		.reply-button {
+			background-color: #f0f8ff;
+			border-radius: 5px;
+			padding: 10px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+			outline: none;
+			border: none;
+			min-width: 20%;
+			max-width: 75%;
+			height: max-content;
+			align-self: flex-end;
+			cursor: pointer;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			justify-content: center;
+			gap: 5px;
+			text-align: left;
+			margin-right: 10px;
+		}
+
+		.reply-button span {
+			color: #4284f4;
+			border-top: 1px solid #767676;
+			width: 100%;
+			padding-top: 3px;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			position: relative;
+		}
+
+		.reply-button:hover {
+			background-color: #fff;
+		} */
+
+		.reply-message {
+			background-color: #f6f6f6;
+			border-radius: 25px;
+			padding: 10px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+			min-width: 20%;
+			max-width: 75%;
+			height: max-content;
+			align-self: flex-end;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			word-wrap: break-word;
+			margin-right: 10px;
+		}
+
+		.reply-message p {
+			/* font-size: 16px;
+			line-height: 1.5; */
+			margin: 0;
+		}
+
+		.reply-button {
+			background-color: #fff;
+			border-radius: 25px;
+			padding: 10px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+			outline: none;
+			border: none;
+			min-width: 20%;
+			max-width: 75%;
+			height: max-content;
+			align-self: flex-end;
+			cursor: pointer;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			justify-content: center;
+			gap: 5px;
+			text-align: left;
+			margin-right: 10px;
+		}
+
+		.reply-button span {
+			color: #4284f4;
+			border-top: 1px solid #767676;
+			width: 100%;
+			padding-top: 3px;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			position: relative;
+		}
+
+		.reply-button:hover {
+			background-color: #f0f8ff;
+		}
+
+		/* .reply-form {
+			width: 75%;
+			border: 1px solid #f1f1f1;
+			align-self: flex-end;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 15px;
+			padding: 3px;
+			margin-right: 10px;
+		}
+
+		.reply-form input,
+		textarea {
+			width: 100%;
+			margin: 0;
+			border: none;
+			outline: none;
+			box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+			font-family: Arial, sans-serif;
+			font-size: 14px;
+			line-height: 1.5;
+			margin: 0;
+		}
+
+		.reply-form .submit-btn {
+			width: 100%;
+			height: 25px;
+			background-color: #ef4823;
+			color: #fff;
+			border: none;
+			outline: none;
+			border-radius: 3px;
+			cursor: pointer;
+		}
+
+		.reply-form .submit-btn:hover {
+			opacity: 0.8;
+		} */
+
+		.reply-form {
+			width: 75%;
+			border: 1px solid #f1f1f1;
+			align-self: flex-end;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 15px;
+			padding: 3px;
+			margin-right: 10px;
+		}
+
+		.reply-form input,
+		textarea {
+			width: 100%;
+			margin: 0;
+			border: none;
+			outline: none;
+			box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+			font-family: Arial, sans-serif;
+			font-size: 14px;
+			line-height: 1.5;
+			margin: 0;
+			padding: 10px;
+		}
+
+		.reply-form .submit-btn {
+			width: 100%;
+			height: 35px;
+			background-color: #4284f4;
+			color: #fff;
+			border: none;
+			outline: none;
+			border-radius: 5px;
+			cursor: pointer;
+			transition: background-color 0.2s ease-in-out;
+		}
+
+		.reply-form .submit-btn:hover {
+			background-color: #2766c7;
+		}
+
+		.reply-form .submit-btn:active {
+			transform: scale(0.95);
+		}
+
+		.error {
+			justify-self: center;
+			align-self: center;
+			color: red;
+			margin: 10px;
+		}
+
+		/* .show_more_btn {
+			background: #4caf50;
+			color: #fff;
+			outline: none;
+			border: none;
+			min-height: 30px;
+			cursor: pointer;
+		} */
+
+		.show_more_btn {
+			background-color: #4caf50;
+			color: #fff;
+			border: none;
+			outline: none;
+			padding: 10px 20px;
+			border-radius: 5px;
+			/* font-size: 14px; */
+			cursor: pointer;
+			transition: background-color 0.3s ease-in-out;
+			width: 85%;
+			margin: auto;
+		}
+
+		.show_more_btn:hover {
+			background-color: #3d8b3d;
+		}
+	</style>
+</head>
+<body>
+	<div class="webchat-container" id="webchat-container">
+		<div class="webchat" id="webchat">
+			<div class="close" id="close">
+				<i class="fas fa-sync reset" id="reset"></i>
+				<i class="fas fa-times close-btn" id="close-btn"></i>
+			</div>
+			<div class="footer-container">
+				<div class="input-container">
+					<input
+						type="text"
+						placeholder="Type your message here"
+						id="user-input"
+					/>
+					<i class="fas fa-paper-plane" id="send-button"></i>
+					<!-- <button id="send-button">Send</button> -->
+				</div>
+				<div class="webchat-footer">
+					<a href="https://dialafrika.com/products" target="_blank"
+						>Powered by Bonga</a
+					>
+				</div>
+			</div>
+		</div>
+		<div class="widget-container" id="widget-container">
+			<button class="widget-button" id="widget-button">
+				<i class="fas fa-comment-alt"></i>
+			</button>
+		</div>
+	</div>
+</body>
+<script>
+	const baseUrl = "http://localhost:3000";
+
+	let selectedCategory;
+	let selectedService;
+	let clientId;
+	let ticketId;
+	let socketId;
+	let clientMessage;
+
+	const webchatContainer = document.querySelector(".webchat-container");
+	const widgetContainer = document.querySelector(".widget-container");
+	const webchat = document.querySelector(".webchat");
+	webchat.scrollTop = webchat.scrollHeight;
+	const observer = new MutationObserver(() => {
+		webchat.scrollTop = webchat.scrollHeight;
+	});
+	const options = {
+		childList: true,
+		subtree: true,
+	};
+	observer.observe(webchat, options);
+
+	webchat.style.display = "none";
+
+	document.getElementById("close-btn").addEventListener("click", () => {
+		webchatContainer.style.height = "max-content";
+		webchatContainer.style.width = "max-content";
+		webchat.style.display = "none";
+		document.getElementById("widget-container").style.display = "block";
+	});
+
+	document
+		.getElementById("widget-button")
+		.addEventListener("click", function () {
+			webchatContainer.style.height = "70vh";
+			webchatContainer.style.width = "300px";
+			webchat.style.display = "flex";
+			document.getElementById("widget-container").style.display = "none";
+		});
+
+	const userReplyInput = document.querySelector(".input-container");
+
+	const webchatUrl = `${baseUrl}/webchat/1/process`;
+	const messageDiv = document.createElement("div");
+	messageDiv.classList.add("message");
+	messageDiv.classList.add("loading");
+	webchat.appendChild(messageDiv);
+
+	const replyMessageDiv = document.createElement("div");
+	const newMessageDiv = document.createElement("div");
+	const newReplyMessageDiv = document.createElement("div");
+	const newestMessageDiv = document.createElement("div");
+	const noSelectionReplyMessageDiv = document.createElement("div");
+	const satisfiedReplyMessageDiv = document.createElement("div");
+	const satisfiedMessageDiv = document.createElement("div");
+	const createTicketMessageDiv = document.createElement("div");
+	const rejectTicketReplyDiv = document.createElement("div");
+	const rejectTicketMessageDiv = document.createElement("div");
+	const successfulMessageDiv = document.createElement("div");
+	const ticketForm = document.createElement("form");
+	const error = document.createElement("p");
+
+	async function handleLiveChat() {
+		try {
+			const socket = await io.connect(baseUrl);
+			let divCount = 0;
+			let clientDivCount = 0;
+
+			socket.on("no_agent_found", (res) => {
+				webchat.appendChild(newestMessageDiv);
+				newestMessageDiv.classList.add("message");
+				const newestMessage = document.createElement("p");
+				newestMessage.textContent = res;
+				newestMessageDiv.appendChild(newestMessage);
+				handleShowTicketForm();
+			});
+
+			socket.on("agent_found", (res) => {
+				webchat.appendChild(newestMessageDiv);
+				newestMessageDiv.classList.add("message");
+				const newestMessage = document.createElement("p");
+				newestMessage.textContent = res;
+				newestMessageDiv.appendChild(newestMessage);
+				userReplyInput.style.display = "flex";
+				const userInput = document.querySelector("#user-input");
+				userInput.addEventListener("input", () => {
+					const inputValue = userInput.value;
+					clientMessage = inputValue;
+				});
+				const sendMsgBtn = document.getElementById("send-button");
+				sendMsgBtn.addEventListener("click", async () => {
+					if (clientMessage) {
+						const res = await fetch(webchatUrl, {
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({
+								route: "LIVE_CHAT",
+								payload: {
+									clientId: clientId,
+									ticketId: ticketId,
+									socketId: socketId,
+									clientMessage: clientMessage,
+								},
+							}),
+						})
+							.then((res) => res.json())
+							.then((data) => {
+								const messageDivCount = ++clientDivCount;
+								const messageDiv = document.createElement("div");
+								webchat.appendChild(messageDiv);
+								messageDiv.classList.add("reply-message");
+								const newestMessage = document.createElement("p");
+								newestMessage.textContent = clientMessage;
+								messageDiv.appendChild(newestMessage);
+								clientMessage = "";
+								userInput.value = "";
+							});
+					}
+				});
+			});
+
+			socket.on("message_from_agent", (res) => {
+				const messageDivCount = ++divCount;
+				const messageDiv = document.createElement("div");
+				webchat.appendChild(messageDiv);
+				messageDiv.classList.add("message");
+				const newestMessage = document.createElement("p");
+				newestMessage.textContent = res;
+				messageDiv.appendChild(newestMessage);
+			});
+
+			socket.on("live_ticket_closed", (res) => {
+				const messageDivCount = ++divCount;
+				const messageDiv = document.createElement("div");
+				webchat.appendChild(messageDiv);
+				messageDiv.classList.add("message");
+				const newestMessage = document.createElement("p");
+				newestMessage.textContent = res;
+				messageDiv.appendChild(newestMessage);
+				userReplyInput.style.display = "none";
+			});
+
+			newMessageDiv.classList.add("message");
+			newMessageDiv.classList.add("loading");
+			webchat.appendChild(newMessageDiv);
+			socket.on("connect", async () => {
+				socketId = socket.id;
+				const res = await fetch(webchatUrl, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						route: "LIVE_CHAT",
+						payload: {
+							clientId: clientId,
+							ticketId: ticketId,
+							socketId: socketId,
+						},
+					}),
+				})
+					.then((res) => res.json())
+					.then((data) => {
+						const newMessage = document.createElement("p");
+						newMessage.textContent =
+							"A new ticket has been created. Finding you a live agent...";
+						newMessageDiv.classList.remove("loading");
+						newMessageDiv.appendChild(newMessage);
+						clientId = data?.data?.payload?.message?.clientId;
+						ticketId = data?.data?.payload?.message?.ticketId;
+					});
+			});
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	function handleSatisfied(message) {
+		const satisfiedReplyMessage = document.createElement("p");
+		satisfiedReplyMessage.textContent = message;
+		satisfiedReplyMessageDiv.classList.add("reply-message");
+		satisfiedReplyMessageDiv.appendChild(satisfiedReplyMessage);
+		webchat.appendChild(satisfiedReplyMessageDiv);
+		satisfiedMessageDiv.classList.add("message");
+		satisfiedMessageDiv.classList.add("loading");
+		webchat.appendChild(satisfiedMessageDiv);
+		setTimeout(() => {
+			const finalMessage = document.createElement("p");
+			finalMessage.textContent = "Thanks for using our live chat service";
+			satisfiedMessageDiv.classList.remove("loading");
+			satisfiedMessageDiv.appendChild(finalMessage);
+			selectedCategory = "";
+			selectedService = "";
+		}, 1000);
+	}
+
+	function handleShowTicketForm() {
+		const subjectInput = document.createElement("input");
+		subjectInput.setAttribute("name", "subject");
+		subjectInput.setAttribute("type", "text");
+		subjectInput.setAttribute("placeholder", "Ticket Subject");
+		subjectInput.setAttribute("required", true);
+		const descriptionInput = document.createElement("textarea");
+		descriptionInput.setAttribute("name", "description");
+		descriptionInput.setAttribute("type", "text");
+		descriptionInput.setAttribute("placeholder", "Description");
+		descriptionInput.setAttribute("required", true);
+		const nameInput = document.createElement("input");
+		nameInput.setAttribute("name", "name");
+		nameInput.setAttribute("type", "text");
+		nameInput.setAttribute("placeholder", "Full Name");
+		nameInput.setAttribute("required", true);
+		const emailInput = document.createElement("input");
+		emailInput.setAttribute("name", "email");
+		emailInput.setAttribute("type", "email");
+		emailInput.setAttribute("placeholder", "Email Address");
+		const phoneInput = document.createElement("input");
+		phoneInput.setAttribute("name", "phone");
+		phoneInput.setAttribute("type", "tel");
+		phoneInput.setAttribute("placeholder", "Phone Number");
+		phoneInput.setAttribute("required", true);
+		const submitBtn = document.createElement("button");
+		submitBtn.setAttribute("type", "submit");
+		submitBtn.classList.add("submit-btn");
+		submitBtn.textContent = "Create Ticket";
+		ticketForm.classList.add("reply-form");
+		ticketForm.appendChild(subjectInput);
+		ticketForm.appendChild(descriptionInput);
+		ticketForm.appendChild(nameInput);
+		ticketForm.appendChild(emailInput);
+		ticketForm.appendChild(phoneInput);
+		ticketForm.appendChild(submitBtn);
+		ticketForm.onsubmit = (e) => {
+			e.preventDefault();
+			const formData = new FormData(ticketForm);
+			submitBtn.textContent = "Submitting...";
+			fetch(webchatUrl, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					route: "NOT_LISTED",
+					payload: {
+						ticketId: ticketId,
+						clientId: clientId,
+						service: selectedService?.value,
+						category: selectedCategory?.value,
+						subject: formData.get("subject"),
+						description: formData.get("description"),
+						name: formData.get("name"),
+						email: formData.get("email"),
+						phone: formData.get("phone"),
+						action: "save_ticket",
+					},
+				}),
+			})
+				.then((res) => res.json())
+				.then((data) => {
+					submitBtn.textContent = "Submitted";
+					submitBtn.setAttribute("disabled", true);
+					successfulMessageDiv.classList.add("message");
+					successfulMessageDiv.classList.add("loading");
+					webchat.appendChild(successfulMessageDiv);
+					setTimeout(() => {
+						const finalMessage = document.createElement("p");
+						finalMessage.textContent = data?.data?.payload?.message;
+						successfulMessageDiv.classList.remove("loading");
+						successfulMessageDiv.appendChild(finalMessage);
+						selectedCategory = "";
+						selectedService = "";
+					}, 1000);
+				})
+				.catch(() => {
+					error.classList.add("error");
+					error.textContent =
+						"There was an error completing your request. Try again!";
+					webchat.appendChild(error);
+				});
+		};
+		webchat.append(ticketForm);
+	}
+
+	function handleRejectTicketForm(message) {
+		const rejectReplyMessage = document.createElement("p");
+		rejectReplyMessage.textContent = message;
+		rejectTicketReplyDiv.classList.add("reply-message");
+		rejectTicketReplyDiv.appendChild(rejectReplyMessage);
+		webchat.appendChild(rejectTicketReplyDiv);
+		rejectTicketMessageDiv.classList.add("message");
+		rejectTicketMessageDiv.classList.add("loading");
+		webchat.appendChild(rejectTicketMessageDiv);
+		setTimeout(() => {
+			const finalMessage = document.createElement("p");
+			finalMessage.textContent = "Thanks for using our live chat service";
+			rejectTicketMessageDiv.classList.remove("loading");
+			rejectTicketMessageDiv.appendChild(finalMessage);
+			selectedCategory = "";
+			selectedService = "";
+		}, 1000);
+	}
+
+	function handleNoSelection(message) {
+		const noSelectionReplyMessage = document.createElement("p");
+		noSelectionReplyMessage.textContent = message;
+		noSelectionReplyMessageDiv.classList.add("reply-message");
+		noSelectionReplyMessageDiv.appendChild(noSelectionReplyMessage);
+		webchat.appendChild(noSelectionReplyMessageDiv);
+		createTicketMessageDiv.classList.add("message");
+		createTicketMessageDiv.classList.add("loading");
+		webchat.appendChild(createTicketMessageDiv);
+		fetch(webchatUrl, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				route: "NOT_LISTED",
+				payload: {},
+			}),
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				const newestMessage = document.createElement("p");
+				newestMessage.textContent = data?.data?.payload?.message;
+				createTicketMessageDiv.classList.remove("loading");
+				createTicketMessageDiv.appendChild(newestMessage);
+				const replyYesBtn = document.createElement("button");
+				replyYesBtn.setAttribute("id", "replyYesBtn");
+				replyYesBtn.classList.add("reply-button");
+				replyYesBtn.textContent = "Yes";
+				replyYesBtn.addEventListener("click", () => {
+					document.getElementById("replyYesBtn").remove();
+					document.getElementById("replyNoBtn").remove();
+					handleShowTicketForm();
+				});
+				webchat.appendChild(replyYesBtn);
+				const replyNoBtn = document.createElement("button");
+				replyNoBtn.setAttribute("id", "replyNoBtn");
+				replyNoBtn.classList.add("reply-button");
+				replyNoBtn.textContent = "No";
+				replyNoBtn.addEventListener("click", () => {
+					document.getElementById("replyYesBtn").remove();
+					document.getElementById("replyNoBtn").remove();
+					handleRejectTicketForm("No");
+				});
+				webchat.append(replyNoBtn);
+			})
+			.catch(() => {
+				error.classList.add("error");
+				error.textContent =
+					"There was an error completing your request. Try again!";
+				webchat.appendChild(error);
+			});
+	}
+
+	function specificItemSelected() {
+		newestMessageDiv.classList.add("message");
+		newestMessageDiv.classList.add("loading");
+		webchat.appendChild(newestMessageDiv);
+		fetch(webchatUrl, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				route: "FAQS",
+				payload: {
+					service: selectedService?.value,
+					category: selectedCategory?.value,
+				},
+			}),
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				const newestMessage = document.createElement("p");
+				newestMessage.textContent = data?.data?.payload?.message;
+				newestMessageDiv.classList.remove("loading");
+				newestMessageDiv.appendChild(newestMessage);
+				const faqAvailable = data?.data?.payload?.data?.find(
+					(item) => item?.key === "faq"
+				);
+				if (faqAvailable) {
+					// data?.data?.payload?.data?.map((dataItem) => {
+					// 	if (dataItem?.key === "faq") {
+					// 		const dataItemFaqBtn = document.createElement("button");
+					// 		dataItemFaqBtn.classList.add("message-button");
+					// 		dataItemFaqBtn.textContent = dataItem?.label;
+					// 		if (dataItem?.description) {
+					// 			const dataItemFaqDescription = document.createElement("span");
+					// 			dataItemFaqDescription.textContent = dataItem?.description;
+					// 			dataItemFaqBtn.appendChild(dataItemFaqDescription);
+					// 		}
+					// 		webchat.appendChild(dataItemFaqBtn);
+					// 	}
+					// });
+					// const faqReplyBtn = document.createElement("button");
+					// faqReplyBtn.setAttribute("id", "faqReplyBtn");
+					// faqReplyBtn.classList.add("reply-button");
+					// faqReplyBtn.textContent =
+					// 	data?.data?.payload?.data[
+					// 		data?.data?.payload?.data?.length - 1
+					// 	]?.label;
+					// if (
+					// 	data?.data?.payload?.data[data?.data?.payload?.data?.length - 1]
+					// 		?.description
+					// ) {
+					// 	const faqReplyDescription = document.createElement("span");
+					// 	faqReplyDescription.textContent =
+					// 		data?.data?.payload?.data[
+					// 			data?.data?.payload?.data?.length - 1
+					// 		]?.description;
+					// 	faqReplyDescription.addEventListener("mouseover", () => {
+					// 		faqReplyDescription.style.whiteSpace = "normal";
+					// 		faqReplyDescription.style.textOverflow = "initial";
+					// 	});
+					// 	faqReplyDescription.addEventListener("mouseout", () => {
+					// 		faqReplyDescription.style.whiteSpace = "nowrap";
+					// 		faqReplyDescription.style.textOverflow = "ellipsis";
+					// 	});
+					// 	faqReplyBtn.appendChild(faqReplyDescription);
+					// }
+					const maxToShow = 3;
+					let hiddenFaqButtons = [];
+
+					data?.data?.payload?.data?.map((dataItem, index) => {
+						if (dataItem?.key === "faq") {
+							const dataItemFaqBtn = document.createElement("button");
+							dataItemFaqBtn.classList.add("message-button");
+							dataItemFaqBtn.textContent = dataItem?.label;
+
+							if (dataItem?.description) {
+								const dataItemFaqDescription = document.createElement("span");
+								dataItemFaqDescription.textContent = dataItem?.description;
+								dataItemFaqDescription.addEventListener("mouseover", () => {
+									dataItemFaqDescription.style.whiteSpace = "normal";
+									dataItemFaqDescription.style.textOverflow = "initial";
+								});
+								dataItemFaqDescription.addEventListener("mouseout", () => {
+									dataItemFaqDescription.style.whiteSpace = "nowrap";
+									dataItemFaqDescription.style.textOverflow = "ellipsis";
+								});
+
+								dataItemFaqBtn.appendChild(dataItemFaqDescription);
+							}
+
+							if (index < maxToShow) {
+								webchat.appendChild(dataItemFaqBtn);
+							} else {
+								hiddenFaqButtons.push(dataItemFaqBtn);
+							}
+						}
+					});
+
+					if (hiddenFaqButtons.length > 0) {
+						const showMoreButton = document.createElement("button");
+						showMoreButton.classList.add("show_more_btn");
+						showMoreButton.textContent = "Show More";
+
+						showMoreButton.addEventListener("click", () => {
+							hiddenFaqButtons.forEach((faqBtn) => {
+								const secondLastElement =
+									webchat.children[webchat.children.length - 3];
+								webchat.insertBefore(faqBtn, secondLastElement.nextSibling);
+								//webchat.appendChild(faqBtn);
+							});
+							showMoreButton.remove();
+						});
+
+						webchat.appendChild(showMoreButton);
+					}
+
+					const faqReplyBtn = document.createElement("button");
+					faqReplyBtn.setAttribute("id", "faqReplyBtn");
+					faqReplyBtn.classList.add("reply-button");
+					faqReplyBtn.textContent =
+						data?.data?.payload?.data[
+							data?.data?.payload?.data?.length - 1
+						]?.label;
+
+					if (
+						data?.data?.payload?.data[data?.data?.payload?.data?.length - 1]
+							?.description
+					) {
+						const faqReplyDescription = document.createElement("span");
+						faqReplyDescription.textContent =
+							data?.data?.payload?.data[
+								data?.data?.payload?.data?.length - 1
+							]?.description;
+
+						faqReplyBtn.appendChild(faqReplyDescription);
+					}
+
+					webchat.appendChild(faqReplyBtn);
+
+					faqReplyBtn.addEventListener("click", () => {
+						faqReplyBtn.remove();
+						document.getElementById("satisfiedBtn").remove();
+						handleNoSelection(
+							data?.data?.payload?.data[data?.data?.payload?.data?.length - 1]
+								?.label
+						);
+					});
+					webchat.append(faqReplyBtn);
+					const satisfiedReplyBtn = document.createElement("button");
+					satisfiedReplyBtn.setAttribute("id", "satisfiedBtn");
+					satisfiedReplyBtn.classList.add("reply-button");
+					satisfiedReplyBtn.textContent = "Satisfied";
+
+					const satisfiedReplyDescription = document.createElement("span");
+					satisfiedReplyDescription.textContent =
+						"Satisfied with the responses";
+					satisfiedReplyBtn.appendChild(satisfiedReplyDescription);
+					satisfiedReplyBtn.addEventListener("click", () => {
+						satisfiedReplyBtn.remove();
+						document.getElementById("faqReplyBtn").remove();
+						handleSatisfied("Satisfied");
+					});
+					webchat.append(satisfiedReplyBtn);
+				} else {
+					const faqReplyBtn = document.createElement("button");
+					faqReplyBtn.classList.add("reply-button");
+					faqReplyBtn.textContent = data?.data?.payload?.data[0]?.label;
+					if (data?.data?.payload?.data[0]?.description) {
+						const faqReplyDescription = document.createElement("span");
+						faqReplyDescription.textContent =
+							data?.data?.payload?.data[0]?.description;
+						faqReplyBtn.appendChild(faqReplyDescription);
+					}
+					faqReplyBtn.addEventListener("click", () => {
+						faqReplyBtn.remove();
+						handleNoSelection(data?.data?.payload?.data[0]?.label);
+					});
+					webchat.append(faqReplyBtn);
+				}
+			})
+			.catch(() => {
+				error.classList.add("error");
+				error.textContent =
+					"There was an error completing your request. Try again!";
+				webchat.appendChild(error);
+			});
+	}
+
+	function optionSelected(type) {
+		newMessageDiv.classList.add("message");
+		newMessageDiv.classList.add("loading");
+		webchat.appendChild(newMessageDiv);
+		fetch(webchatUrl, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				route:
+					type === "services"
+						? "SERVICES"
+						: type === "categories"
+						? "CATEGORIES"
+						: "",
+				payload: {},
+			}),
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				const newMessage = document.createElement("p");
+				newMessage.textContent = data?.data?.payload?.message;
+				newMessageDiv.classList.remove("loading");
+				newMessageDiv.appendChild(newMessage);
+				// data?.data?.payload?.data?.map((dataItem) => {
+				// 	const dataItemReplyBtn = document.createElement("button");
+				// 	dataItemReplyBtn.setAttribute("id", "dataItem");
+				// 	dataItemReplyBtn.classList.add("reply-button");
+				// 	dataItemReplyBtn.textContent = dataItem?.label;
+
+				// 	if (dataItem?.description) {
+				// 		const dataItemReplyDescription = document.createElement("span");
+				// 		dataItemReplyDescription.textContent = dataItem?.description;
+				// 		dataItemReplyDescription.addEventListener("mouseover", () => {
+				// 			dataItemReplyDescription.style.whiteSpace = "normal";
+				// 			dataItemReplyDescription.style.textOverflow = "initial";
+				// 		});
+				// 		dataItemReplyDescription.addEventListener("mouseout", () => {
+				// 			dataItemReplyDescription.style.whiteSpace = "nowrap";
+				// 			dataItemReplyDescription.style.textOverflow = "ellipsis";
+				// 		});
+				// 		dataItemReplyBtn.appendChild(dataItemReplyDescription);
+				// 	}
+				// 	dataItemReplyBtn.addEventListener("click", () => {
+				// 		const buttons = document.querySelectorAll("#dataItem");
+				// 		buttons.forEach((button) => button.remove());
+
+				// 		if (type === "categories") {
+				// 			selectedCategory = dataItem;
+				// 		}
+				// 		if (type === "services") {
+				// 			selectedService = dataItem;
+				// 		}
+				// 		if (dataItem?.value === "NOT_LISTED") {
+				// 			handleNoSelection(dataItem?.label);
+				// 		} else {
+				// 			const replyMessage = document.createElement("p");
+				// 			replyMessage.textContent = dataItem?.label;
+				// 			newReplyMessageDiv.classList.add("reply-message");
+				// 			newReplyMessageDiv.appendChild(replyMessage);
+				// 			webchat.appendChild(newReplyMessageDiv);
+				// 			specificItemSelected();
+				// 		}
+				// 	});
+				// 	webchat.appendChild(dataItemReplyBtn);
+				// });
+				const dataItems = data?.data?.payload?.data;
+
+				if (dataItems) {
+					const maxToShow = 3;
+					const hasMore = dataItems.length > maxToShow;
+					const dataItemsToShow = hasMore
+						? dataItems.slice(0, maxToShow)
+						: dataItems;
+
+					dataItemsToShow.forEach((dataItem) => {
+						const dataItemReplyBtn = document.createElement("button");
+						dataItemReplyBtn.setAttribute("id", "dataItem");
+						dataItemReplyBtn.classList.add("reply-button");
+						dataItemReplyBtn.textContent = dataItem?.label;
+
+						if (dataItem?.description) {
+							const dataItemReplyDescription = document.createElement("span");
+							dataItemReplyDescription.textContent = dataItem?.description;
+							dataItemReplyDescription.addEventListener("mouseover", () => {
+								dataItemReplyDescription.style.whiteSpace = "normal";
+								dataItemReplyDescription.style.textOverflow = "initial";
+							});
+							dataItemReplyDescription.addEventListener("mouseout", () => {
+								dataItemReplyDescription.style.whiteSpace = "nowrap";
+								dataItemReplyDescription.style.textOverflow = "ellipsis";
+							});
+							dataItemReplyBtn.appendChild(dataItemReplyDescription);
+						}
+
+						dataItemReplyBtn.addEventListener("click", () => {
+							const buttons = document.querySelectorAll("#dataItem");
+							buttons.forEach((button) => button.remove());
+							const showMoreButtons =
+								document.querySelectorAll(".show_more_btn");
+							showMoreButtons.forEach((button) => button.remove());
+
+							if (type === "categories") {
+								selectedCategory = dataItem;
+							}
+							if (type === "services") {
+								selectedService = dataItem;
+							}
+							if (dataItem?.value === "NOT_LISTED") {
+								handleNoSelection(dataItem?.label);
+							} else {
+								const replyMessage = document.createElement("p");
+								replyMessage.textContent = dataItem?.label;
+								newReplyMessageDiv.classList.add("reply-message");
+								newReplyMessageDiv.appendChild(replyMessage);
+								webchat.appendChild(newReplyMessageDiv);
+								specificItemSelected();
+							}
+						});
+
+						webchat.appendChild(dataItemReplyBtn);
+					});
+
+					if (hasMore) {
+						const showMoreButton = document.createElement("button");
+						showMoreButton.classList.add("show_more_btn");
+						showMoreButton.textContent = "Show More";
+						showMoreButton.addEventListener("click", () => {
+							dataItems.slice(maxToShow).forEach((dataItem) => {
+								const dataItemReplyBtn = document.createElement("button");
+								dataItemReplyBtn.setAttribute("id", "dataItem");
+								dataItemReplyBtn.classList.add("reply-button");
+								dataItemReplyBtn.textContent = dataItem?.label;
+
+								if (dataItem?.description) {
+									const dataItemReplyDescription =
+										document.createElement("span");
+									dataItemReplyDescription.textContent = dataItem?.description;
+									dataItemReplyDescription.addEventListener("mouseover", () => {
+										dataItemReplyDescription.style.whiteSpace = "normal";
+										dataItemReplyDescription.style.textOverflow = "initial";
+									});
+									dataItemReplyDescription.addEventListener("mouseout", () => {
+										dataItemReplyDescription.style.whiteSpace = "nowrap";
+										dataItemReplyDescription.style.textOverflow = "ellipsis";
+									});
+									dataItemReplyBtn.appendChild(dataItemReplyDescription);
+								}
+
+								dataItemReplyBtn.addEventListener("click", () => {
+									const buttons = document.querySelectorAll("#dataItem");
+									buttons.forEach((button) => button.remove());
+
+									if (type === "categories") {
+										selectedCategory = dataItem;
+									}
+									if (type === "services") {
+										selectedService = dataItem;
+									}
+									if (dataItem?.value === "NOT_LISTED") {
+										handleNoSelection(dataItem?.label);
+									} else {
+										const replyMessage = document.createElement("p");
+										replyMessage.textContent = dataItem?.label;
+										newReplyMessageDiv.classList.add("reply-message");
+										newReplyMessageDiv.appendChild(replyMessage);
+										webchat.appendChild(newReplyMessageDiv);
+										specificItemSelected();
+									}
+								});
+								webchat.appendChild(dataItemReplyBtn);
+							});
+							showMoreButton.remove();
+						});
+						webchat.appendChild(showMoreButton);
+					}
+				}
+			})
+			.catch(() => {
+				error.classList.add("error");
+				error.textContent =
+					"There was an error completing your request. Try again!";
+				webchat.appendChild(error);
+			});
+	}
+
+	function initialDataLoaded(data) {
+		messageDiv.classList.remove("loading");
+		const welcomeMessage = document.createElement("p");
+		welcomeMessage.textContent = "Chat with us";
+		messageDiv.appendChild(welcomeMessage);
+		const categoriesReplyBtn = document.createElement("button");
+		categoriesReplyBtn.setAttribute("id", "categoryBtn");
+		categoriesReplyBtn.classList.add("reply-button");
+		categoriesReplyBtn.textContent = "Categories";
+		categoriesReplyBtn.addEventListener("click", () => {
+			document.getElementById("categoryBtn").remove();
+			document.getElementById("serviceBtn").remove();
+			document.getElementById("no-selection").remove();
+			document.getElementById("liveChatBtn").remove();
+			const replyMessage = document.createElement("p");
+			replyMessage.textContent = "Categories";
+			replyMessageDiv.classList.add("reply-message");
+			replyMessageDiv.appendChild(replyMessage);
+			webchat.appendChild(replyMessageDiv);
+			optionSelected("categories");
+		});
+		webchat.appendChild(categoriesReplyBtn);
+		const servicesReplyBtn = document.createElement("button");
+		servicesReplyBtn.setAttribute("id", "serviceBtn");
+		servicesReplyBtn.classList.add("reply-button");
+		servicesReplyBtn.textContent = "Services";
+		servicesReplyBtn.addEventListener("click", () => {
+			document.getElementById("categoryBtn").remove();
+			document.getElementById("serviceBtn").remove();
+			document.getElementById("no-selection").remove();
+			document.getElementById("liveChatBtn").remove();
+			const replyMessage = document.createElement("p");
+			replyMessage.textContent = "Services";
+			replyMessageDiv.classList.add("reply-message");
+			replyMessageDiv.appendChild(replyMessage);
+			webchat.appendChild(replyMessageDiv);
+			optionSelected("services");
+		});
+		webchat.appendChild(servicesReplyBtn);
+		const liveChatBtn = document.createElement("button");
+		liveChatBtn.setAttribute("id", "liveChatBtn");
+		liveChatBtn.classList.add("reply-button");
+		liveChatBtn.textContent = "Talk to an agent";
+		liveChatBtn.addEventListener("click", () => {
+			document.getElementById("categoryBtn").remove();
+			document.getElementById("serviceBtn").remove();
+			document.getElementById("no-selection").remove();
+			document.getElementById("liveChatBtn").remove();
+			const replyMessage = document.createElement("p");
+			replyMessage.textContent = "Talk to an agent";
+			replyMessageDiv.classList.add("reply-message");
+			replyMessageDiv.appendChild(replyMessage);
+			webchat.appendChild(replyMessageDiv);
+			handleLiveChat();
+		});
+		webchat.appendChild(liveChatBtn);
+		const dataItemReplyBtn = document.createElement("button");
+		dataItemReplyBtn.setAttribute("id", "no-selection");
+		dataItemReplyBtn.classList.add("reply-button");
+		dataItemReplyBtn.textContent = data?.data?.payload?.data[0]?.label;
+		const dataItemReplyDescription = document.createElement("span");
+		dataItemReplyDescription.textContent =
+			data?.data?.payload?.data[0]?.description;
+		dataItemReplyBtn.appendChild(dataItemReplyDescription);
+		dataItemReplyBtn.addEventListener("click", () => {
+			document.getElementById("categoryBtn").remove();
+			document.getElementById("serviceBtn").remove();
+			document.getElementById("no-selection").remove();
+			document.getElementById("liveChatBtn").remove();
+			handleNoSelection(data?.data?.payload?.data[0]?.label);
+		});
+		webchat.appendChild(dataItemReplyBtn);
+	}
+
+	function createReplyDiv() {
+		replyMessageDiv.classList.add("reply-message");
+		webchat.appendChild(replyMessageDiv);
+	}
+
+	function initializeWebchat() {
+		fetch(webchatUrl, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				initialDataLoaded(data);
+			})
+			.catch(() => {
+				error.classList.add("error");
+				error.textContent =
+					"There was an error completing your request. Try again!";
+				webchat.appendChild(error);
+			});
+	}
+
+	initializeWebchat();
+
+	const resetBtn = document.getElementById("reset");
+	resetBtn.addEventListener("click", () => {
+		while (webchat.children[2]) {
+			webchat.removeChild(webchat.children[2]);
+		}
+		messageDiv.textContent = "";
+		messageDiv.classList.add("loading");
+		selectedCategory = "";
+		selectedService = "";
+		clientId = "";
+		ticketId = "";
+		socketId = "";
+		clientMessage = "";
+		replyMessageDiv.remove();
+		newMessageDiv.remove();
+		newReplyMessageDiv.remove();
+		newestMessageDiv.remove();
+		noSelectionReplyMessageDiv.remove();
+		satisfiedReplyMessageDiv.remove();
+		satisfiedMessageDiv.remove();
+		createTicketMessageDiv.remove();
+		rejectTicketReplyDiv.remove();
+		rejectTicketMessageDiv.remove();
+		successfulMessageDiv.remove();
+		ticketForm.remove();
+		userReplyInput.style.display = "none";
+		while (replyMessageDiv.firstChild) {
+			replyMessageDiv.removeChild(replyMessageDiv.firstChild);
+		}
+		while (newMessageDiv.firstChild) {
+			newMessageDiv.removeChild(newMessageDiv.firstChild);
+		}
+		while (newReplyMessageDiv.firstChild) {
+			newReplyMessageDiv.removeChild(newReplyMessageDiv.firstChild);
+		}
+		while (newestMessageDiv.firstChild) {
+			newestMessageDiv.removeChild(newestMessageDiv.firstChild);
+		}
+		while (noSelectionReplyMessageDiv.firstChild) {
+			noSelectionReplyMessageDiv.removeChild(
+				noSelectionReplyMessageDiv.firstChild
+			);
+		}
+		while (satisfiedReplyMessageDiv.firstChild) {
+			satisfiedReplyMessageDiv.removeChild(satisfiedReplyMessageDiv.firstChild);
+		}
+		while (satisfiedMessageDiv.firstChild) {
+			satisfiedMessageDiv.removeChild(satisfiedMessageDiv.firstChild);
+		}
+		while (createTicketMessageDiv.firstChild) {
+			createTicketMessageDiv.removeChild(createTicketMessageDiv.firstChild);
+		}
+		while (rejectTicketReplyDiv.firstChild) {
+			rejectTicketReplyDiv.removeChild(rejectTicketReplyDiv.firstChild);
+		}
+		while (rejectTicketMessageDiv.firstChild) {
+			rejectTicketMessageDiv.removeChild(rejectTicketMessageDiv.firstChild);
+		}
+		while (successfulMessageDiv.firstChild) {
+			successfulMessageDiv.removeChild(successfulMessageDiv.firstChild);
+		}
+		while (ticketForm.firstChild) {
+			ticketForm.removeChild(ticketForm.firstChild);
+		}
+		error.textContent = "";
+		initializeWebchat();
+	});
+</script>
